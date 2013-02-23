@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css">
+  <style type="text/css">
+    body {
+      color: #333;
+      font-family: "Helvetica", sans-serif
+    }
+
+    a {
+      color: #4183c4;
+      text-decoration: none;
+    }
+    .main {
+      width: 400px;
+      margin: 60px auto;
+      text-align: center;
+    }
+
+    .hint {
+      color: #AAA;
+      font-size: 80%;
+    }
+
+    #bookmarklet {
+      color: #333;
+      text-decoration: none;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.9);
+      padding: 7px 15px;
+      font-size: 13px;
+      font-weight: bold;
+      border-radius: 3px;
+      border: 1px solid #ddd;
+      border-bottom-color: #c5c5c5;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.075);
+      vertical-align: middle;
+      background-color: #eaeaea;
+      background-image: -moz-linear-gradient(#fafafa, #eaeaea);
+      background-image: -webkit-linear-gradient(#fafafa, #eaeaea);
+      background-image: linear-gradient(#fafafa, #eaeaea);
+      background-repeat: repeat-x;
+    }
+    #bookmarklet:hover {
+      cursor: move;
+    }
+    #bookmarklet.error {
+      color: #e33;
+    }
+
+    .icon-bookmark {
+      margin-right: 5px;
+    }
+
+    #info {
+      margin: 50px 0 15px 0;
+      font-size: 20px;
+    }
+    #info img {
+      border-radius: 3px;
+      vertical-align: middle;
+      margin-right: 8px;
+      position: relative;
+      top: -1px;
+    }
+  </style>
+</head>
+<body>
+
+  <section class="main">
+    <a id="bookmarklet">
+      <span class="icon-bookmark"></span>
+      <span class="label">Loading...</span>
+    </a>
+    <p class="hint">Drag to your bookmarks bar</p>
+    <div id="info"></div>
+    <p id="description"></p>
+  </section>
+
+  <script type="text/javascript">
+    (function() {
+      var query = window.location.search.substring(1).split('&').reduce(function(memo, pair) {
+        pair = pair.split('=');
+        memo[pair[0]] = pair[1];
+        return memo;
+      }, {});
+
+      $.ajax('https://api.github.com/gists/' + query.gist, {
+        dataType: 'jsonp', 
+        success: function(responseData) {
+          if (responseData.meta.status === 200) {
+            createBookmarklet(responseData);
+          }
+          else {
+            showError(responseData);
+          }
+        }
+      });
+
+      function createBookmarklet(responseData) {
+        var description = responseData.data.description,
+            files = responseData.data.files,
+            file = query.file || Object.keys(files)[0],
+            fileUrl = files[file] ? files[file].raw_url : null,
+            fileHashParam = 'file-'+file.replace(/\./g, '-').toLowerCase(),
+            href = "javascript:(function%20()%20%7Bvar%20script%20=%20document.createElement(%22script%22);script.src%20=%20%22"+fileUrl+"%22;document.getElementsByTagName(%22head%22)[0].appendChild(script);%7D());";
+
+
+        $('#bookmarklet .label').text('Gistlet: '+file);
+        $('#bookmarklet').attr('href', href);
+
+        $('#info').append($(
+          '<img src="'+responseData.data.user.avatar_url+'" width="26" height="26">' +
+          '<a href="'+responseData.data.user.html_url+'">'+responseData.data.user.login+'</a> / ' +
+          '<a href="'+responseData.data.html_url+'#'+fileHashParam+'"><strong>gist:'+query.gist+'</strong></a>'
+        ));
+
+        $('#description').text(description);
+      }
+
+      function showError(responseData) {
+        $('#bookmarklet .label').text(responseData.data.message);
+        $('#bookmarklet').addClass('error');
+        $('.hint').hide();
+      }
+    })();
+  </script>
+
+</body>
+</html>
