@@ -25,15 +25,11 @@
       font-size: 80%;
     }
 
-    #bookmarklet {
-      display: inline-block;
-      margin-top: 150px;
+    .button {
       color: #333;
       text-decoration: none;
-      text-shadow: 0 1px 0 rgba(255,255,255,0.9);
-      padding: 14px 38px;
-      font-size: 18px;
       font-weight: bold;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.9);
       border-radius: 3px;
       border: 1px solid #ddd;
       border-bottom-color: #c5c5c5;
@@ -44,6 +40,13 @@
       background-image: -webkit-linear-gradient(#fafafa, #eaeaea);
       background-image: linear-gradient(#fafafa, #eaeaea);
       background-repeat: repeat-x;
+    }
+
+    #bookmarklet {
+      display: inline-block;
+      margin-top: 150px;
+      padding: 14px 38px;
+      font-size: 18px;
     }
     #bookmarklet:hover {
       cursor: move;
@@ -67,18 +70,35 @@
       position: relative;
       top: -1px;
     }
+
+    input {
+      width: 100%;
+      padding: 9px;
+      font-size: 16px;
+      border-radius: 5px;
+      outline: none;
+      border: 1px solid #ccc;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.075);
+      box-sizing: border-box;
+    }
+
   </style>
 </head>
 <body>
 
   <section class="main">
-    <a id="bookmarklet">
+    <a id="bookmarklet" class="button">
       <span class="icon-bookmark"></span>
       <span class="label">Loading...</span>
     </a>
     <p class="hint">Drag to your bookmarks bar</p>
     <div id="info"></div>
     <p id="description"></p>
+
+    <form id="get-gistlet-form" method="get" style="display:none;">
+      <input type="text" name="gist" placeholder="Gist ID">
+      <input type="submit" value="Get Gistlet" class="button">
+    </form>
   </section>
 
   <script type="text/javascript">
@@ -89,17 +109,22 @@
         return memo;
       }, {});
 
-      $.ajax('https://api.github.com/gists/' + query.gist, {
-        dataType: 'jsonp', 
-        success: function(responseData) {
-          if (responseData.meta.status === 200) {
-            createBookmarklet(responseData);
+      if (query.gist) {
+        $.ajax('https://api.github.com/gists/' + query.gist, {
+          dataType: 'jsonp', 
+          success: function(responseData) {
+            if (responseData.meta.status === 200) {
+              createBookmarklet(responseData);
+            }
+            else {
+              showError(responseData);
+            }
           }
-          else {
-            showError(responseData);
-          }
-        }
-      });
+        });
+      }
+      else {
+        showHelpMessage();
+      }
 
       function createBookmarklet(responseData) {
         var description = responseData.data.description,
@@ -126,6 +151,12 @@
         $('#bookmarklet .label').text(responseData.data.message);
         $('#bookmarklet').addClass('error');
         $('.hint').hide();
+      }
+
+      function showHelpMessage() {
+        $('#bookmarklet').hide();
+        $('.hint').hide();
+        $('#get-gistlet-form').show();
       }
     })();
   </script>
