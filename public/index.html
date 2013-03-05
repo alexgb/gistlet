@@ -19,6 +19,7 @@
     .main {
       width: 400px;
       margin: 0 auto;
+      margin-top: 150px;
       text-align: center;
     }
 
@@ -44,16 +45,15 @@
       background-repeat: repeat-x;
     }
 
-    #bookmarklet {
+    #bookmarklet-btn {
       display: inline-block;
-      margin-top: 150px;
       padding: 14px 38px;
       font-size: 18px;
     }
-    #bookmarklet:hover {
+    #bookmarklet-btn:hover {
       cursor: move;
     }
-    #bookmarklet.error {
+    #bookmarklet-btn.error {
       color: #e33;
     }
 
@@ -89,18 +89,27 @@
 <body>
 
   <section class="main">
-    <a id="bookmarklet" class="button">
-      <span class="icon-bookmark"></span>
-      <span class="label">Loading...</span>
-    </a>
-    <p class="hint">Drag to your bookmarks bar</p>
-    <div id="info"></div>
-    <p id="description"></p>
 
-    <form id="get-gistlet-form" method="get" style="display:none;">
-      <input type="text" name="gist" placeholder="Gist ID">
-      <input type="submit" value="Get Gistlet" class="button">
-    </form>
+    <div class="intro">
+      <h1>Gistlet</h1>
+      <p>Create bookmarklets from a gist.</p>
+      <form id="get-gistlet-form" method="get">
+        <input type="text" name="gist" placeholder="Gist ID">
+        <input type="submit" value="Get Gistlet" class="button">
+      </form>
+    </div>
+
+
+    <div class="bookmarklet">
+      <a id="bookmarklet-btn" class="button">
+        <span class="icon-bookmark"></span>
+        <span class="label"></span>
+      </a>
+      <p class="hint"></p>
+      <div id="info"></div>
+      <p id="description"></p>
+    </div>
+
   </section>
 
   <script type="text/javascript">
@@ -112,6 +121,8 @@
       }, {});
 
       if (query.gist) {
+        $('.bookmarklet .label').text("Loading...");
+        $('.intro').hide();
         $.ajax('https://api.github.com/gists/' + query.gist, {
           dataType: 'jsonp', 
           success: function(responseData) {
@@ -125,13 +136,17 @@
         });
       }
       else {
-        showHelpMessage();
+        $('.bookmarklet').hide();
       }
 
       function createBookmarklet(responseData) {
-        var description = responseData.data.description,
+        var description = responseData.data.description || '',
             files = responseData.data.files,
-            fileName = query.file, 
+            fileName = query.file,
+            user = responseData.data.user,
+            user_avatar_url = user ? user.avatar_url : '',
+            user_html_url = user ? user.html_url : '',
+            user_login = user ? user.login : '',
             fileHashParam, href;
 
         // take first file if none defined
@@ -146,12 +161,13 @@
 
         fileHashParam = 'file-'+fileName.replace(/\./g, '-').toLowerCase();
 
-        $('#bookmarklet .label').text('Gistlet: '+fileName);
-        $('#bookmarklet').attr('href', bookmarkletSrc(query.gist, fileName));
+        $('#bookmarklet-btn .label').text('Gistlet: '+fileName);
+        $('#bookmarklet-btn').attr('href', bookmarkletSrc(query.gist, fileName));
+        $('.bookmarklet .hint').text("Drag to your bookmarks bar");
 
         $('#info').append($(
-          '<img src="'+responseData.data.user.avatar_url+'" width="26" height="26">' +
-          '<a href="'+responseData.data.user.html_url+'">'+responseData.data.user.login+'</a> / ' +
+          '<img src="'+user_avatar_url+'" width="26" height="26">' +
+          '<a href="'+user_html_url+'">'+user_login+'</a> / ' +
           '<a href="'+responseData.data.html_url+'#'+fileHashParam+'"><strong>gist:'+query.gist+'</strong></a>'
         ));
 
@@ -163,15 +179,9 @@
       }
 
       function showError(responseData) {
-        $('#bookmarklet .label').text(responseData.data.message);
-        $('#bookmarklet').addClass('error');
+        $('#bookmarklet-btn .label').text(responseData.data.message);
+        $('#bookmarklet-btn').addClass('error');
         $('.hint').hide();
-      }
-
-      function showHelpMessage() {
-        $('#bookmarklet').hide();
-        $('.hint').hide();
-        $('#get-gistlet-form').show();
       }
     })();
   </script>
