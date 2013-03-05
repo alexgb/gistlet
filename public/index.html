@@ -131,14 +131,23 @@
       function createBookmarklet(responseData) {
         var description = responseData.data.description,
             files = responseData.data.files,
-            file = query.file || Object.keys(files)[0],
-            fileUrl = files[file] ? files[file].raw_url : null,
-            fileHashParam = 'file-'+file.replace(/\./g, '-').toLowerCase(),
-            href = "javascript:(function%20()%20%7Bvar%20script%20=%20document.createElement(%22script%22);script.src%20=%20%22"+fileUrl+"%22;document.getElementsByTagName(%22head%22)[0].appendChild(script);%7D());";
+            fileName = query.file, 
+            fileHashParam, href;
 
+        // take first file if none defined
+        if (!fileName) {
+          for (var key in files) { 
+            if (files.hasOwnProperty(key)) {
+              fileName = key;
+              break;
+            } 
+          }
+        }
 
-        $('#bookmarklet .label').text('Gistlet: '+file);
-        $('#bookmarklet').attr('href', href);
+        fileHashParam = 'file-'+fileName.replace(/\./g, '-').toLowerCase();
+
+        $('#bookmarklet .label').text('Gistlet: '+fileName);
+        $('#bookmarklet').attr('href', bookmarkletSrc(query.gist, fileName));
 
         $('#info').append($(
           '<img src="'+responseData.data.user.avatar_url+'" width="26" height="26">' +
@@ -147,6 +156,10 @@
         ));
 
         $('#description').text(description);
+      }
+
+      function bookmarkletSrc(gistId, fileName) {
+        return "javascript:%28function%28e%2Ct%2Cn%29%7Bfunction%20i%28t%2Cn%29%7Bvar%20i%3Ddocument.createElement%28%22script%22%29%2Cs%3Dfalse%2Co%3D%22callback%22%2Br%2B%2B%2Cu%3Bt%3Dt%2B%22%3Fcallback%3DJSONP.%22%2Bo%3Be.JSONP%5Bo%5D%3Dn%3Bi.src%3Dt%3Bi.async%3Dtrue%3Bi.onload%3Di.onreadystatechange%3Dfunction%28%29%7Bif%28%21s%26%26%28%21this.readyState%7C%7Cthis.readyState%3D%3D%3D%22loaded%22%7C%7Cthis.readyState%3D%3D%3D%22complete%22%29%29%7Bs%3Dtrue%3Bi.onload%3Di.onreadystatechange%3Dnull%3Bif%28i%26%26i.parentNode%29%7Bi.parentNode.removeChild%28i%29%7D%7D%7D%3Bif%28%21u%29%7Bu%3Ddocument.getElementsByTagName%28%22head%22%29%5B0%5D%7Du.appendChild%28i%29%7Dfunction%20s%28e%2Ct%2Cn%29%7Bi%28%22https%3A%2F%2Fapi.github.com%2Fgists%2F%22%2Be%2Cfunction%28e%29%7Bvar%20r%3De.data.files%2Ci%3Dt%3Fr%5Bt%5D%3Anull%3Bif%28%21i%29%7Bfor%28var%20s%20in%20r%29%7Bif%28r.hasOwnProperty%28s%29%29%7Bi%3Dr%5Bs%5D%3Bbreak%7D%7D%7Dn%28i.raw_url%29%7D%29%7Dvar%20r%3D0%3Be.JSONP%3D%7B%7D%3Bs%28t%2Cn%2Cfunction%28e%29%7Bvar%20t%3Ddocument.createElement%28%22script%22%29%3Bt.src%3De%2B%22%3Ft%3D%22%2B%28new%20Date%29.getTime%28%29%3Bdocument.getElementsByTagName%28%22head%22%29%5B0%5D.appendChild%28t%29%7D%29%7D%29%28window%2C%22"+gistId+"%22%2C%22"+fileName+"%22%29";
       }
 
       function showError(responseData) {
