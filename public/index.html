@@ -19,7 +19,7 @@
     .main {
       width: 400px;
       margin: 0 auto;
-      margin-top: 150px;
+      margin-top: 100px;
       text-align: center;
     }
 
@@ -61,8 +61,14 @@
       margin-right: 5px;
     }
 
+    #description {
+      margin-top: 80px;
+      margin-bottom: 80px;
+      line-height: 1.2;
+    }
+
     #info {
-      margin: 150px 0 15px 0;
+      margin: 80px 0 15px 0;
       font-size: 20px;
     }
     #info img {
@@ -106,8 +112,8 @@
         <span class="label"></span>
       </a>
       <p class="hint"></p>
-      <div id="info"></div>
       <p id="description"></p>
+      <div id="info"></div>
     </div>
 
   </section>
@@ -147,7 +153,7 @@
             user_avatar_url = user ? user.avatar_url : '',
             user_html_url = user ? user.html_url : '',
             user_login = user ? user.login : '',
-            fileHashParam, href;
+            fileHashParam, href, fileNameParts;
 
         // take first file if none defined
         if (!fileName) {
@@ -159,9 +165,15 @@
           }
         }
 
+        fileNameParts = fileName.split('.');
+        if (fileNameParts.length > 1) {
+          fileNameParts = fileNameParts.slice(0,-1);
+        }
+        fileName = fileNameParts.join('.');
+
         fileHashParam = 'file-'+fileName.replace(/\./g, '-').toLowerCase();
 
-        $('#bookmarklet-btn .label').text('Gistlet: '+fileName);
+        $('#bookmarklet-btn .label').text(fileName);
         $('#bookmarklet-btn').attr('href', bookmarkletSrc(query.gist, fileName));
         $('.bookmarklet .hint').text("Drag to your bookmarks bar");
 
