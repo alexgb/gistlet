@@ -153,7 +153,7 @@
             user_avatar_url = user ? user.avatar_url : '',
             user_html_url = user ? user.html_url : '',
             user_login = user ? user.login : '',
-            fileHashParam, href, fileNameParts;
+            fileHashParam, href, fileNameParts, baseName;
 
         // take first file if none defined
         if (!fileName) {
@@ -167,13 +167,12 @@
 
         fileNameParts = fileName.split('.');
         if (fileNameParts.length > 1) {
-          fileNameParts = fileNameParts.slice(0,-1);
+          baseName = fileNameParts.slice(0,-1).join('.');
         }
-        fileName = fileNameParts.join('.');
 
         fileHashParam = 'file-'+fileName.replace(/\./g, '-').toLowerCase();
 
-        $('#bookmarklet-btn .label').text(fileName);
+        $('#bookmarklet-btn .label').text(baseName);
         $('#bookmarklet-btn').attr('href', bookmarkletSrc(query.gist, fileName));
         $('.bookmarklet .hint').text("Drag to your bookmarks bar");
 
