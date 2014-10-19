@@ -1,0 +1,22 @@
+{
+  "name": "gistlet",
+  "version": "0.0.0",
+  "description": "Create bookmarklets from public gists ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/alexgb/gistlet.git"
+  },
+  "author": "Alex Gibbons",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "cdc7321000d3a09c90350911ec1e814d7923a0c8",
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "uglify-js": "~2.4.15",
+    "grunt-ejs": "~0.2.0"
+  }
+}

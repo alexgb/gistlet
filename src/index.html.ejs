@@ -187,7 +187,7 @@
       }
 
 
-      var bookmarkletModuleSrc = "!function(e%2Ct%2Ca)%7Bfunction%20n(t%2Ca)%7Bvar%20n%2Cc%3Ddocument.createElement(%22script%22)%2Ci%3D!1%2Cd%3D%22callback%22%2Br%2B%2B%3Bt%3Dt%2B%22%3Fcallback%3D%22%2Bo%2B%22.%22%2Bd%2Ce%5Bo%5D%5Bd%5D%3Da%2Cc.src%3Dt%2Cc.async%3D!0%2Cc.onload%3Dc.onreadystatechange%3Dfunction()%7Bi%7C%7Cthis.readyState%26%26%22loaded%22!%3D%3Dthis.readyState%26%26%22complete%22!%3D%3Dthis.readyState%7C%7C(i%3D!0%2Cc.onload%3Dc.onreadystatechange%3Dnull%2Cc%26%26c.parentNode%26%26c.parentNode.removeChild(c))%7D%2Cn%7C%7C(n%3Ddocument.getElementsByTagName(%22head%22)%5B0%5D)%2Cn.appendChild(c)%7Dfunction%20c(e%2Ct%2Ca)%7Bn(%22https%3A%2F%2Fapi.github.com%2Fgists%2F%22%2Be%2Cfunction(e)%7Bvar%20n%2Cc%3De.data.files%2Cr%3Dt%3Fc%5Bt%5D%3Anull%3Bif(!r)for(var%20o%20in%20c)if(c.hasOwnProperty(o))%7Br%3Dc%5Bo%5D%3Bbreak%7Dn%3Dr.raw_url.replace(%22gist.githubusercontent.com%22%2C%22cdn.rawgit.com%22)%2Ca(n)%7D)%7Dvar%20r%3D0%2Co%3D%22JSONP_%22%2BMath.random().toString(36).replace(%2F%5C.%2F%2C%22%22)%3Be%5Bo%5D%3D%7B%7D%2Cc(t%2Ca%2Cfunction(e)%7Bvar%20t%3Ddocument.createElement(%22script%22)%3Bt.src%3De%2B%22%3Ft%3D%22%2B(new%20Date).getTime()%2Cdocument.getElementsByTagName(%22head%22)%5B0%5D.appendChild(t)%7D)%7D(window%2C%22__GISTID__%22%2C%22__FILENAME__%22)%3B";
+      var bookmarkletModuleSrc = "<%= makeBookmarklet('src/bookmarklet_raw.js') %>";
 
       function addParamsToBookmarkletSrc(src, gistId, fileName) {
         return src.replace('__GISTID__', gistId)
